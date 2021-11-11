@@ -14,10 +14,10 @@ void onRising2() {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  pinMode(27, INPUT);
-  attachInterrupt(digitalPinToInterrupt(27), onRising1, RISING);
-  pinMode(13, INPUT);
-  attachInterrupt(digitalPinToInterrupt(13), onRising2, RISING);
+  pinMode(16, INPUT);
+  attachInterrupt(digitalPinToInterrupt(16), onRising1, RISING);
+  pinMode(17, INPUT);
+  attachInterrupt(digitalPinToInterrupt(17), onRising2, RISING);
 
 
 }
