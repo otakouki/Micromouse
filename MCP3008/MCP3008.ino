@@ -33,42 +33,25 @@ void loop()
   Serial.println(analogData[0]);
   Serial.print("ch1:L");
   Serial.println(analogData[1]);
+  delay(1000);
   get_adc(1);
   Serial.print("ch2:R");
   Serial.println(analogData[0]);
   Serial.print("ch2:L");
   Serial.println(analogData[1]);
+  delay(1000);
   get_adc(2);
   Serial.print("ch3:R");
   Serial.println(analogData[0]);
   Serial.print("ch3:L");
   Serial.println(analogData[1]);
+  delay(1000);
   get_adc(3);
   Serial.print("ch4:R");
   Serial.println(analogData[0]);
   Serial.print("ch4:L");
   Serial.println(analogData[1]);
-  get_adc(4);
-  Serial.print("ch5:R");
-  Serial.println(analogData[0]);
-  Serial.print("ch5:L");
-  Serial.println(analogData[1]);
-  get_adc(5);
-  Serial.print("ch6:R");
-  Serial.println(analogData[0]);
-  Serial.print("ch6:L");
-  Serial.println(analogData[1]);
-  get_adc(6);
-  Serial.print("ch7:R");
-  Serial.println(analogData[0]);
-  Serial.print("ch7:L");
-  Serial.println(analogData[1]);
-  get_adc(7);
-  Serial.print("ch8:R");
-  Serial.println(analogData[0]);
-  Serial.print("ch8:L");
-  Serial.println(analogData[1]);
-  delay(1);
+  delay(1000);
 }
 
 void get_adc(byte ch)
@@ -85,15 +68,15 @@ void get_adc(byte ch)
 
 
 
-  //------[ ADC1のデータを取得する ]------
-//  digitalWrite(slaveSelectPin1, LOW);       //CS LOW
-//  SPI.transfer(0x01);                       //①スタートビット送信
-//  data[2] = SPI.transfer((ch << 4) | 0x80);  //②Single-ended チャンネル選択,ADC0のbit9,8取得
-//  data[3] = SPI.transfer(0);                //③ADC0のbit7～0取得
-//  digitalWrite(slaveSelectPin1, HIGH);                  //CS HIGH
-//
-//
-//
+ // ------[ ADC1のデータを取得する ]------
+  digitalWrite(slaveSelectPin1, LOW);       //CS LOW
+  SPI.transfer(0x01);                       //①スタートビット送信
+  data[2] = SPI.transfer((ch << 4) | 0x80);  //②Single-ended チャンネル選択,ADC0のbit9,8取得
+  data[3] = SPI.transfer(0);                //③ADC0のbit7～0取得
+  digitalWrite(slaveSelectPin1, HIGH);                  //CS HIGH
+
+
+
   analogData[0] = ((data[0] & 0x03) << 8) | data[1];  //ADC0
   analogData[1] = ((data[2] & 0x03) << 8) | data[3];  //ADC1
   //return analogData[0];

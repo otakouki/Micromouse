@@ -24,7 +24,8 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println("pulseCounter1: " + String(pulseCounter));
-  Serial.println("pulseCounter2: " + String(pulseCounter2));
+
+  Serial.println(String(pulseCounter));
+  delay(5000);
 
 }
