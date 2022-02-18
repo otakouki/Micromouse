@@ -18,7 +18,7 @@
 
 // 電圧定義
 #define MAX_VSET 0x3F   // 5.06V
-#define MIN_VSET 0x10   // 0.72V
+#define MIN_VSET 0x09   // 0.72V
 #define R_VSET 0x0D  // 2.97V
 #define L_VSET 0x25  // 2.97V
 
@@ -31,7 +31,6 @@ int analogData[16];
 int r_analogData;
 int l_analogData;
 int cnt = 0;
-
 
 
 //**********************************************************************
@@ -66,16 +65,56 @@ void setup() {
 
 
 void loop() {
+  int lr = get_Rsns(0, "l");
   int sta = get_Rsns(0, "r");
+  int left1 = get_Rsns(1, "l");
+  int right1 = get_Rsns(1, "r");
+  int left2 = get_Rsns(2, "l");
+  int right2 = get_Rsns(2, "r");
+  //  int left3 = get_Rsns(3, "l");
+  //  int right3 = get_Rsns(3, "r");
+  //int left4 = get_Rsns(4, "l");
+  //int right4 = get_Rsns(4, "r");
+  int left5 = get_Rsns(5, "l");
+  int right5 = get_Rsns(5, "r");
 
   static int forward = 0;
   static int turn = 0;
 
   if (forward == 1) {
+    if (turn == 1) {
+      if (left1 == 1 || left2 == 1) {
+        //if(left5 == 1){
+        Serial.print("left start");
+        writeMotorResister(DRV_ADR_L, MIN_VSET + 4, FORWARD);
+        writeMotorResister(DRV_ADR_R, MIN_VSET + 2, FORWARD);
+        delay(50);
+      }
+      if (right1 == 1 || right2 == 1) {
+        //if(right5 == 1){
+        Serial.print("right start");
+        writeMotorResister(DRV_ADR_L, MIN_VSET + 2, FORWARD);
+        writeMotorResister(DRV_ADR_R, MIN_VSET + 4, FORWARD);
+        delay(50);
+      }
+      if (lr == 1) {
+        writeMotorResister(DRV_ADR_L, MIN_VSET + 2, FORWARD);
+        writeMotorResister(DRV_ADR_R, MIN_VSET + 2, FORWARD);
+        Serial.println("ln end");
+        delay(1000);
+        turn = 0;
+      }
+    } else {
+      if (lr == 1) {
+        Serial.println("ln start");
+        delay(1000);
+        turn = 1;
+      }
+    }
     if (sta == 1) {
       Serial.print("stop");
-      writeMotorResister(DRV_ADR_R, MIN_VSET, STOP);
       writeMotorResister(DRV_ADR_L, MIN_VSET, STOP);
+      writeMotorResister(DRV_ADR_R, MIN_VSET, STOP);
       delay(3000);
       forward = 0;
     }
@@ -84,12 +123,12 @@ void loop() {
     if (sta == 1) {
 
       Serial.print("start");
-      writeMotorResister(DRV_ADR_R, MIN_VSET+2, FORWARD);
-      writeMotorResister(DRV_ADR_L, MIN_VSET+2, FORWARD);
+      writeMotorResister(DRV_ADR_L, MIN_VSET + 2, FORWARD);
+      writeMotorResister(DRV_ADR_R, MIN_VSET + 2, FORWARD);
       delay(1000);
       //delay(50);
       forward = 1;
-      
+
     }
   }
   delay(10);
