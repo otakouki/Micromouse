@@ -108,7 +108,7 @@ void loop() {
       }
     } else {
       if (lr == 1) {
-        Serial.println("ln start");
+        Serial.println("turn start");
         delay(1000);
         turn = 1;
       }
