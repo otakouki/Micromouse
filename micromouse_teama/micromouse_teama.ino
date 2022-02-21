@@ -1,12 +1,8 @@
 #include <Wire.h>
 
-
-
 // I2Cアドレス
 #define DRV_ADR_R   0x64  // RightDRV8830のI2Cアドレス
 #define DRV_ADR_L   0x60  // LeftDRV8830のI2Cアドレス
-
-
 
 // ブリッジ制御
 #define STOP      0x00  //停止
@@ -14,24 +10,17 @@
 #define BACKWARD  0x02  //逆転
 #define BACKWARD  0x03  //ブレーキ
 
-
-
 // 電圧定義
 #define MAX_VSET 0x3F   // 5.06V
 #define MIN_VSET 0x09   // 0.72V
 #define R_VSET 0x0D  // 2.97V
 #define L_VSET 0x25  // 2.97V
 
-
 #include <SPI.h>
 #define slaveSelectPin0 4
 #define slaveSelectPin1 5
 
 int analogData[16];
-int r_analogData;
-int l_analogData;
-int cnt = 0;
-
 
 //**********************************************************************
 //モータドライバ I2C制御 motor driver I2C
@@ -49,13 +38,11 @@ void writeMotorResister(int motor, byte vset, byte dir) {
   Wire.endTransmission(true);
 }
 
-
-
 void setup() {
   Wire.begin();
   Serial.begin(115200);
-  pinMode(slaveSelectPin0, OUTPUT);          //SS(10)を出力に設定
-  pinMode(slaveSelectPin1, OUTPUT);
+  pinMode(slaveSelectPin0, OUTPUT);          //SS(4)を出力に設定
+  pinMode(slaveSelectPin1, OUTPUT);          //SS(5)を出力に設定
   SPI.setBitOrder(MSBFIRST);                //MSBから送信
   SPI.setClockDivider(SPI_CLOCK_DIV2);      //クロック分周設定
   SPI.setDataMode(SPI_MODE0);               //SPIモード0
@@ -65,22 +52,37 @@ void setup() {
 
 
 void loop() {
-  int lr = get_Rsns(0, "l");
-  int sta = get_Rsns(0, "r");
-  int left1 = get_Rsns(1, "l");
-  int right1 = get_Rsns(1, "r");
+  int lr = get_Rsns(0, "l");      //コーナー取得用の変数
+  int sta = get_Rsns(0, "r");     //スタートストップ用の変数
+  /*** 
+   *  left1~4:左寄りか判定
+   *  left5right5:真っ直ぐになっているか
+   *  right1~4:右寄りか判定
+   */
+  int left1 = get_Rsns(1, "l");   
   int left2 = get_Rsns(2, "l");
-  int right2 = get_Rsns(2, "r");
-  //  int left3 = get_Rsns(3, "l");
-  //  int right3 = get_Rsns(3, "r");
-  //int left4 = get_Rsns(4, "l");
-  //int right4 = get_Rsns(4, "r");
+  int left3 = get_Rsns(3, "l");
+  int left4 = get_Rsns(4, "l");
   int left5 = get_Rsns(5, "l");
+  int right1 = get_Rsns(1, "r");
+  int right2 = get_Rsns(2, "r");
+  int right3 = get_Rsns(3, "r");
+  int right4 = get_Rsns(4, "r");
   int right5 = get_Rsns(5, "r");
-
+  /***
+   * スタート・ゴール判定用
+   * スタートマーカーが認識：１
+   * ゴールマーカーが認識:０
+   */
   static int forward = 0;
+  
+  /***
+   * コーナーマーカー認識しているかの判定
+   * コーナー開始：1
+   * コーナー終了:0
+   */
   static int turn = 0;
-
+  
   if (forward == 1) {
     if (turn == 1) {
       if (left1 == 1 || left2 == 1) {
@@ -100,7 +102,7 @@ void loop() {
       if (lr == 1) {
         writeMotorResister(DRV_ADR_L, MIN_VSET + 2, FORWARD);
         writeMotorResister(DRV_ADR_R, MIN_VSET + 2, FORWARD);
-        Serial.println("ln end");
+        Serial.println("turn end");
         delay(1000);
         turn = 0;
       }
@@ -131,10 +133,13 @@ void loop() {
 
     }
   }
-  delay(10);
+  delay(100000);
 }
 
-void get_adc(byte ch) {
+/***
+ * 
+ */
+void get_adc(int ch) {
   byte data[4] = {0, 0, 0, 0};                               //SPI通信用変数
   //------[ ADC0のデータを取得する ]------
   digitalWrite(slaveSelectPin0, LOW);       //CS LOW
@@ -153,15 +158,18 @@ void get_adc(byte ch) {
   digitalWrite(slaveSelectPin1, HIGH);                  //CS HIGH
   analogData[0] = ((data[0] & 0x03) << 8) | data[1];  //ADC0
   analogData[1] = ((data[2] & 0x03) << 8) | data[3];  //ADC1
-  //return analogData[0];
 }
 
+/***
+ * ch:チャンネル番号
+ * leri:右ならr,左ならl
+ * analogDataが100以下の時:1
+ * analogDataが100以上の時:0
+ */
 int get_Rsns(int ch, String leri) {
-  //for (int i = 0; i < 6; i++) {
   get_adc(ch);
-  r_analogData = analogData[0];
-  l_analogData = analogData[1];
-  //}
+  int r_analogData = analogData[0]; //ADC0
+  int l_analogData = analogData[1]; //ADC1
 
   if (leri == "r") {
     if (r_analogData <= 100) {
