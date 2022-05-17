@@ -1,5 +1,0 @@
-
-#********** START OF eagle-lbr2kicad-1.0.ulp 3.1 04-03-2022 :19:20:52 LOG **********#
-    Conversion completed with no Messages
-#********** END OF eagle-lbr2kicad-1.0.ulp 3.1 04-03-2022 :19:20:52 LOG **********#
-
