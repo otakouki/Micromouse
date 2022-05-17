@@ -1,0 +1,11 @@
+
+#********** START OF eagle-lbr2kicad-1.0.ulp 3.1 13-05-2022 :19:07:18 LOG **********#
+Missing Prefix Part =''				BATT					my_lbr		M
+Missing Prefix Part =''				DRV8830					my_lbr		M
+Missing Prefix Part =''				LED_LEAD					my_lbr		M
+Missing Prefix Part =''				SOT_23_5_MC					my_lbr		M
+Missing Prefix Part =''				MS5611-01BA03					my_lbr		M
+Missing Prefix Part =''				SOT_23_5_MC					my_lbr		M
+Missing Prefix Part =''				QUECTEL-L80					my_lbr		M
+#********** END OF eagle-lbr2kicad-1.0.ulp 3.1 13-05-2022 :19:07:18 LOG **********#
+

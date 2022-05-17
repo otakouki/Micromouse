@@ -1,0 +1,11 @@
+
+#********** START OF eagle-lbr2kicad-1.0.ulp 3.1 04-03-2022 :18:45:55 LOG **********#
+Missing Prefix Part =''				LQFP48					akizuki		M
+Missing Prefix Part =''				DIL08					akizuki		M
+Missing Prefix Part =''				SOT-23-6					akizuki		M
+Missing Prefix Part =''				DIL08					akizuki		M
+Missing Prefix Part =''				EDISON-BASE64					akizuki		M
+Missing Prefix Part =''				LCMXO2-7000HE-B-EVN					akizuki		M
+Missing Prefix Part =''				TB111-2-2-U-1-1					akizuki		M
+#********** END OF eagle-lbr2kicad-1.0.ulp 3.1 04-03-2022 :18:45:55 LOG **********#
+

@@ -1,0 +1,23 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model NSL-19M51
+#/266542/682088/2.49/2/4/Undefined or Miscellaneous
+DEF NSL-19M51 U 0 30 Y Y 1 F N
+F0 "U" 650 300 50 H V L CNN
+F1 "NSL-19M51" 650 200 50 H V L CNN
+F2 "NSL-19M51" 650 100 50 H I L CNN
+F3 "http://uk.rs-online.com/web/p/products/0596141" 650 0 50 H I L CNN
+F4 "Photoconductive Cell (LDR) TO18 Silonex NSL-19M51 PCB Through Hole CdS LDR (Light Dependent Resistor) TO-18" 650 -100 50 H I L CNN "Description"
+F5 "" 650 -200 50 H I L CNN "Height"
+F6 "0596141" 650 -300 50 H I L CNN "RS Part Number"
+F7 "http://uk.rs-online.com/web/p/products/0596141" 650 -400 50 H I L CNN "RS Price/Stock"
+F8 "Silonex" 650 -500 50 H I L CNN "Manufacturer_Name"
+F9 "NSL-19M51" 650 -600 50 H I L CNN "Manufacturer_Part_Number"
+DRAW
+X 1 1 0 0 200 R 50 50 0 0 P
+X 2 2 0 -100 200 R 50 50 0 0 P
+P 5 0 1 6 200 100 600 100 600 -200 200 -200 200 100 N
+ENDDRAW
+ENDDEF
+#
+#End Library
