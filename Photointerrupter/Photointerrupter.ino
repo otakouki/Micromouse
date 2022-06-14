@@ -7,6 +7,7 @@ unsigned long pulseCounter2 = 0;
 void onRising1() {
   ++pulseCounter;
 }
+
 void onRising2() {
   ++pulseCounter2;
 }
@@ -14,18 +15,20 @@ void onRising2() {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  pinMode(16, INPUT);
-  attachInterrupt(digitalPinToInterrupt(16), onRising1, RISING);
-  pinMode(17, INPUT);
-  attachInterrupt(digitalPinToInterrupt(17), onRising2, RISING);
-
-
+  pinMode(34, INPUT);
+  attachInterrupt(digitalPinToInterrupt(34), onRising1, FALLING);
+  pinMode(35, INPUT);
+  attachInterrupt(digitalPinToInterrupt(35), onRising2, FALLING);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  Serial.println(String(pulseCounter));
-  delay(5000);
+  Serial.println("カウンター数:" + String(pulseCounter));
+  int a = digitalRead(34);
+  Serial.println(a);
+  int b = analogRead(34);
+  Serial.println(b);
+  delay(100);
 
 }
