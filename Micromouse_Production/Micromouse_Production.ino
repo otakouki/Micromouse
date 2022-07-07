@@ -101,12 +101,14 @@ void setup() {
 }
 
 void loop() {
-  long times[] = {0};
-  long spin;
-  int i = 0;
-  long timer;
-  long starttime;
-  long goaltime;
+  static unsigned long times[] = {0};  //コーナー間の時間
+  static unsigned long spin; //　コーナー開始時間
+  static unsigned long timer;  //コーナー終了時間
+  static unsigned long starttime = 0;  //スタート時間
+  static unsigned long goaltime = 0; //ゴール時間
+  static int i = 0; //配列に入れる要素番号
+  static boolean flag = false;  //スタートしているかの判定
+  
   int lr = get_Rsns(0, "l");      //コーナー取得用の変数
   int sta = get_Rsns(0, "r");     //スタートストップ用の変数
   /***
@@ -132,71 +134,69 @@ void loop() {
      ゴールマーカーが認識:０
   */
   static int forward = 0;
-
+  
   /***
      コーナーマーカー認識しているかの判定
      コーナー開始：1
      コーナー終了:0
   */
   static int turn = 0;
-  //スタート
-  if (moveflag == false) {
-    if (get_Rsns(0, "r") == 1) {
-      if (forward) {
-        startflag = true;
-      } else {
-        startflag = falsess;
-      }
-    }
-    moveflag = true;
-  } else {
-    moveflag = false;
-  }
-  if (forward && startflag) {
-    Serial.println("stop");
-    goaltime = micros() - starttime;
-    forward = 0;
-    breaki(DRV_ADR_R);
-    breaki(DRV_ADR_L);
-  } else if (!forward && !startflag) {
-    Serial.println("start");
-    starttime = micros();
-    forward = 1;
-    //delay(100);
-    write_vset_l(0x10, M_NORMAL);
-    write_vset_r(0x10, M_NORMAL);
-  }
   
-  if (forward == 0) {
-    return;
+  //スタート・ゴール判定
+  if (forward == 1) {
+    // スタートしていない場合戻る
+    if (flag == false) {
+      return;
+    }
+    // ストップ処理
+    if (sta == 1 && micros() - starttime > 3000000) {
+      Serial.println("stop");
+      goaltime = micros() - starttime;
+      starttime = 0;
+      forward = 0;
+      breaki(DRV_ADR_R);
+      breaki(DRV_ADR_L);
+      flag = false;
+    }
+  } else {
+    // スタート処理
+    if (sta == 1 ) {
+      Serial.println("start" + (String)starttime);
+      starttime = micros();
+      
+      forward = 1;
+      flag = true;
+      //    write_vset_l(0x10, M_NORMAL);
+      //    write_vset_r(0x10, M_NORMAL);
+    }
   }
 
-  if (turn == 1) {
-    if (lr == 1) {
-      Serial.println("turn end");
-      turn = 0;
-      timer = micros() - timer;
-      times[i] = timer;
-      timer = micros();
-      i++;
-    }
-  } else {
-    if (lr == 1) {
-      Serial.println("turn start");
-      if (i == 0) {
-        spin = micros() - starttime;
-        timer = micros();
-        times[i] = spin;
-      } else {
-        timer = micros() - timer;
-        times[i] = timer;
-        timer = micros();
-        i++;
-      }
-      turn = 1;
-      i++;
-    }
-  }
+//  if (turn == 1) {
+//    if (lr == 1) {
+//      Serial.println("turn end");
+//      turn = 0;
+//      timer = micros() - timer;
+//      times[i] = timer;
+//      timer = micros();
+//      i++;
+//    }
+//  } else {
+//    if (lr == 1) {
+//      Serial.println("turn start");
+//      if (i == 0) {
+//        spin = micros() - starttime;
+//        timer = micros();
+//        times[i] = spin;
+//      } else {
+//        timer = micros() - timer;
+//        times[i] = timer;
+//        timer = micros();
+//        i++;
+//      }
+//      turn = 1;
+//      i++;
+//    }
+//  }
 }
 
 void get_adc(byte ch) {
