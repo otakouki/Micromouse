@@ -104,11 +104,11 @@ void loop() {
   static unsigned long times[] = {0};  //コーナー間の時間
   static unsigned long spin; //　コーナー開始時間
   static unsigned long timer;  //コーナー終了時間
-  static unsigned long starttime = 0;  //スタート時間
+  static unsigned long starttime = micros();  //スタート時間
   static unsigned long goaltime = 0; //ゴール時間
   static int i = 0; //配列に入れる要素番号
   static boolean flag = false;  //スタートしているかの判定
-  
+
   int lr = get_Rsns(0, "l");      //コーナー取得用の変数
   int sta = get_Rsns(0, "r");     //スタートストップ用の変数
   /***
@@ -134,14 +134,14 @@ void loop() {
      ゴールマーカーが認識:０
   */
   static int forward = 0;
-  
+
   /***
      コーナーマーカー認識しているかの判定
      コーナー開始：1
      コーナー終了:0
   */
   static int turn = 0;
-  
+
   //スタート・ゴール判定
   if (forward == 1) {
     // スタートしていない場合戻る
@@ -159,44 +159,49 @@ void loop() {
       flag = false;
     }
   } else {
-    // スタート処理
-    if (sta == 1 ) {
-      Serial.println("start" + (String)starttime);
-      starttime = micros();
-      
-      forward = 1;
-      flag = true;
-      //    write_vset_l(0x10, M_NORMAL);
-      //    write_vset_r(0x10, M_NORMAL);
+    // スタート処理]
+    if (startflag == false) {
+      if (sta == 1) {
+        Serial.println("start" + (String)starttime);
+        starttime = micros() - starttime;
+        forward = 1;
+        flag = true;
+        write_vset_l(0x10, M_NORMAL);
+        write_vset_r(0x10, M_NORMAL);
+      }
+      startflag = true;
+    }else{
+      startflag = false;
     }
   }
-
-//  if (turn == 1) {
-//    if (lr == 1) {
-//      Serial.println("turn end");
-//      turn = 0;
-//      timer = micros() - timer;
-//      times[i] = timer;
-//      timer = micros();
-//      i++;
-//    }
-//  } else {
-//    if (lr == 1) {
-//      Serial.println("turn start");
-//      if (i == 0) {
-//        spin = micros() - starttime;
-//        timer = micros();
-//        times[i] = spin;
-//      } else {
-//        timer = micros() - timer;
-//        times[i] = timer;
-//        timer = micros();
-//        i++;
-//      }
-//      turn = 1;
-//      i++;
-//    }
-//  }
+  if (forward == 1) {
+    if (turn == 1) {
+      if (lr == 1) {
+        Serial.println("turn end");
+        turn = 0;
+        timer = micros() - timer;
+        times[i] = timer;
+        timer = micros();
+        i++;
+      }
+    } else {
+      if (lr == 1) {
+        Serial.println("turn start");
+        if (i == 0) {
+          spin = micros() - starttime;
+          timer = micros();
+          times[i] = spin;
+        } else {
+          timer = micros() - timer;
+          times[i] = timer;
+          timer = micros();
+          i++;
+        }
+        turn = 1;
+        i++;
+      }
+    }
+  }
 }
 
 void get_adc(byte ch) {
@@ -231,10 +236,10 @@ int get_Rsns(int ch, String leri) {
   get_adc(ch);
   int r_analogData = analogData[0]; //ADC0
   int l_analogData = analogData[1]; //ADC1
-
+  //Serial.println(r_analogData);
   if (leri == "r") {
     //    Serial.println(r_analogData);
-    if (r_analogData <= 100) {
+    if (r_analogData <= 300) {
       return 1;
     } else {
       return 0;
@@ -242,7 +247,7 @@ int get_Rsns(int ch, String leri) {
   }
   if (leri == "l") {
     //    Serial.println(l_analogData);
-    if (l_analogData <= 100) {
+    if (l_analogData <= 300) {
       return 1;
     } else {
       return 0;
