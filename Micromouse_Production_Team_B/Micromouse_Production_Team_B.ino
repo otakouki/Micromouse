@@ -3,21 +3,23 @@
 // I2Cアドレス
 #define DRV_ADR_R 0x64 // RightDRV8830のI2Cアドレス
 #define DRV_ADR_L 0x60 // LeftDRV8830のI2Cアドレス
-#define CTR_ADR 0x00   // CONTROLレジスタのサブアドレス
-#define FLT_ADR 0x01   // FAULTレジスタのアドレス
+
 // ブリッジ制御
-#define M_STANBY B00  // スタンバイ
-#define M_REVERSE B01 // 逆転
-#define M_NORMAL B10  // 正転
-#define M_BRAKE B11   // ブレーキ
+#define STOP 0x00     //停止
+#define FORWARD 0x01  //正転
+#define BACKWARD 0x02 //逆転
+#define BACKWARD 0x03 //ブレーキ
+
 // 電圧定義
-#define MAX_VSET 0x29 // 3.29V
+#define MAX_VSET 0x3F // 5.06V
 #define MIN_VSET 0x09 // 0.72V
-#define CSPEED 0x23   // 2.81V
+#define R_VSET 0x0D   // 2.97V
+#define L_VSET 0x25   // 2.97V
 
 boolean startflag = false;
 boolean moveflag = false;
 boolean flag = false;
+unsigned long previousMillis = 0;
 
 #define slaveSelectPin0 4
 #define slaveSelectPin1 5
@@ -25,50 +27,14 @@ int analogData[16];
 int R_sns[6];
 int L_sns[6];
 
-int write_vset_r(byte vs, byte ctr)
+void writeMotorResister(int motor, byte vset, byte dir)
 {
-  Wire.beginTransmission(DRV_ADR_R);
-  Wire.write(CTR_ADR);
-  Wire.write(vs << 2 | ctr);
-  return Wire.endTransmission();
+  int vdata = vset << 2 | dir;
+  Wire.beginTransmission(motor);
+  Wire.write(0x00);
+  Wire.write(vdata);
+  Wire.endTransmission(true);
 }
-
-// 制御コマンド送信
-int write_vset_l(byte vs, byte ctr)
-{
-  Wire.beginTransmission(DRV_ADR_L);
-  Wire.write(CTR_ADR);
-  Wire.write(vs << 2 | ctr);
-  return Wire.endTransmission();
-}
-
-void controlreset(byte DRV_ADR)
-{
-  // DRV8830 CONTROLクリア
-  Wire.beginTransmission(DRV_ADR); // I2Cスレーブ「Arduino Uno」のデータ送信開始
-  Wire.write(CTR_ADR);             //コントロール
-  Wire.write(0x00 << 2 | 0x00);    //コントロールクリア
-  Wire.endTransmission();          // I2Cスレーブ「Arduino Uno」のデータ送信終了
-}
-
-void breaki(byte DRV_ADR)
-{
-  // DRV8830 CONTROLクリア
-  Wire.beginTransmission(DRV_ADR); // I2Cスレーブ「Arduino Uno」のデータ送信開始
-  Wire.write(CTR_ADR);             //コントロール
-  Wire.write(0x00 << 2 | 0x03);    //ブレーキ
-  Wire.endTransmission();          // I2Cスレーブ「Arduino Uno」のデータ送信終了
-}
-
-void faultreset(byte DRV_ADR)
-{
-  // DRV8830 FAULTクリア
-  Wire.beginTransmission(DRV_ADR); // I2Cスレーブ「Arduino Uno」のデータ送信開始
-  Wire.write(FLT_ADR);             //フォルト(障害状態)
-  Wire.write(0x80);                //フォルトクリア
-  Wire.endTransmission();          // I2Cスレーブ「Arduino Uno」のデータ送信終了
-}
-
 int16_t count = 0; //カウント数
 unsigned long pulseCounterRight = 0;
 unsigned long pulseCounterLeft = 0;
@@ -90,10 +56,6 @@ void setup()
   Wire.begin();
 
   Serial.begin(115200);
-  controlreset(DRV_ADR_R);
-  controlreset(DRV_ADR_L);
-  faultreset(DRV_ADR_R);
-  faultreset(DRV_ADR_L);
   delay(100);
 
   pinMode(34, INPUT);
@@ -111,6 +73,7 @@ void setup()
 
 void loop()
 {
+  unsigned long currentMillis = millis();
   long times[] = {0};
   long spin;
   int i = 0;
@@ -118,6 +81,7 @@ void loop()
   long starttime;
   long goaltime;
   get_adc();
+
   // int lr = get_Rsns(0, "l");  //コーナー取得用の変数
   // int sta = get_Rsns(0, "r"); //スタートストップ用の変数
   // /***
@@ -164,8 +128,9 @@ void loop()
       goaltime = micros() - starttime;
       starttime = 0;
       forward = 0;
-      breaki(DRV_ADR_R);
-      breaki(DRV_ADR_L);
+      writeMotorResister(DRV_ADR_R, MIN_VSET, STOP);
+      writeMotorResister(DRV_ADR_L, MIN_VSET, STOP);
+      delay(1000);
       flag = false;
     }
   }
@@ -180,8 +145,9 @@ void loop()
         starttime = micros() - starttime;
         forward = 1;
         flag = true;
-        write_vset_l(0x15, M_NORMAL);
-        write_vset_r(0x15, M_NORMAL);
+        writeMotorResister(DRV_ADR_R, MIN_VSET, FORWARD);
+        writeMotorResister(DRV_ADR_L, MIN_VSET, FORWARD);
+        delay(2000);
       }
       startflag = true;
     }
