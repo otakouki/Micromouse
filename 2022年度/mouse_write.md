@@ -20,7 +20,6 @@
  * @author ota koki
  * @date 2022/12/8
  */
-
 // LED用の番号
 #define LED 25
 void setup()
@@ -78,96 +77,75 @@ upload speed を115200/921600→230400
     2022/12/15
       初版
 */
-
 // LED用の番号
 #define LED 25
 const int CHANNEL_A = 0;
 const int CHANNEL_B = 1;
-
 const int LEDC_TIMER_BIT = 8;
 const int LEDC_BASE_FREQ = 490;
-
 const int motorA[3] = {32, 33, 14}; // AIN1, AIN2, PWMA
 const int motorB[3] = {16, 17, 12}; // BIN1, BIN2, PWMB
-
 void setup(){
   Serial.begin(115200);
   // LEDピンの出力設定
   pinMode(LED, OUTPUT);
-
   for (int i = 0; i < 3; i++)
   {
     pinMode(motorA[i], OUTPUT);
     pinMode(motorB[i], OUTPUT);
   }
-
   ledcSetup(CHANNEL_A, LEDC_BASE_FREQ, LEDC_TIMER_BIT);
   ledcSetup(CHANNEL_B, LEDC_BASE_FREQ, LEDC_TIMER_BIT);
-
   ledcAttachPin(motorA[2], CHANNEL_A);
   ledcAttachPin(motorB[2], CHANNEL_B);
 }
-
 void loop(){
   Serial.println("正回転します。");
   delay(100);
-
   // モーターを止める
   for (int i = 0; i < 2; i++)
   {
     digitalWrite(motorA[i], HIGH);
     digitalWrite(motorB[i], HIGH);
   }
-
   digitalWrite(LED, HIGH);
   delay(1000);
   digitalWrite(LED, LOW);
-
   // 左モータ（CCW，時計回り）
   digitalWrite(motorA[1], HIGH);
   digitalWrite(motorA[0], LOW);
   ledcWrite(CHANNEL_A, 100);
-
   // 右モータ（CW，時計回り）
   digitalWrite(motorB[1], LOW);
   digitalWrite(motorB[0], HIGH);
   ledcWrite(CHANNEL_B, 100);
-
   delay(1000);
   digitalWrite(LED, HIGH);
-
   // 左モータ（CCW，時計回り）
   digitalWrite(motorA[1], HIGH);
   digitalWrite(motorA[0], LOW);
   ledcWrite(CHANNEL_A, 150);
-
   // 右モータ（CW，時計回り）
   digitalWrite(motorB[1], LOW);
   digitalWrite(motorB[0], HIGH);
   ledcWrite(CHANNEL_B, 150);
-
   delay(1000);
   digitalWrite(LED, LOW);
-
   // 左モータ（CCW，時計回り）
   digitalWrite(motorA[1], HIGH);
   digitalWrite(motorA[0], LOW);
   ledcWrite(CHANNEL_A, 200);
-
   // 右モータ（CW，時計回り）
   digitalWrite(motorB[1], LOW);
   digitalWrite(motorB[0], HIGH);
   ledcWrite(CHANNEL_B, 200);
-
   digitalWrite(motorA[1], HIGH);
   digitalWrite(motorA[0], LOW);
   ledcWrite(CHANNEL_A, 250);
-
   // 右モータ（CW，時計回り）
   digitalWrite(motorB[1], LOW);
   digitalWrite(motorB[0], HIGH);
   ledcWrite(CHANNEL_B, 250);
-
   delay(1000);
   digitalWrite(LED, HIGH);
 }
@@ -225,7 +203,6 @@ int R_sns_old[6];
 int L_sns[6];
 // cs2の前のデータを格納
 int L_sns_old[6];
-
 void setup()
 {
   Serial.begin(115200);                // シリアル通信開始
@@ -236,7 +213,6 @@ void setup()
   SPI.setDataMode(SPI_MODE0);          // SPI_MODE0(アイドル時のクロックがLow、立ち上がりでサンプリング)
   SPI.begin();                         // SPI通信開始
 }
-
 void loop()
 {
   // ADコンバータの値呼び出し関数
@@ -272,17 +248,14 @@ void get_adc()
     data[0] = SPI.transfer((ch << 4) | 0x80); // ②Single-ended チャンネル選択,ADC0のbit9,8取得
     data[1] = SPI.transfer(0);                // ③ADC0のbit7～0取得
     digitalWrite(slaveSelectPin0, HIGH);      // CS1 HIGH
-
     // ------[ ADC1のデータを取得する ]------
     digitalWrite(slaveSelectPin1, LOW);       // CS2 LOW
     SPI.transfer(0x01);                       // ①スタートビット送信
     data[2] = SPI.transfer((ch << 4) | 0x80); // ②Single-ended チャンネル選択,ADC0のbit9,8取得
     data[3] = SPI.transfer(0);                // ③ADC1のbit7～0取得
     digitalWrite(slaveSelectPin1, HIGH);      // CS2 HIGH
-
     analogData[0] = ((data[0] & 0x03) << 8) | data[1]; // ADC0
     analogData[1] = ((data[2] & 0x03) << 8) | data[3]; // ADC1
-
     if ((int)analogData[0] <= TH_LVL)
     {
       /* code */
@@ -296,7 +269,6 @@ void get_adc()
       }
       R_sns[ch] = (int)0;
     }
-
     if ((int)analogData[1] <= TH_LVL)
     {
       /* code */
@@ -326,11 +298,9 @@ TH_LVL定数:白線と黒線を判別するための境界値
 
 ```arduino
  #include "driver/pcnt.h"
-
 int16_t count = 0;               // カウント数
 unsigned long pulseCounter = 0;  // 割り込み処理
 unsigned long pulseCounter2 = 0; // 割り込み処理
-
 // 割り込み処理(34番PIN)
 void onRising1()
 {
@@ -341,7 +311,6 @@ void onRising2()
 {
   ++pulseCounter2;
 }
-
 void setup()
 {
   Serial.begin(115200);
@@ -349,7 +318,6 @@ void setup()
   pinMode(36, INPUT);
   pinMode(39, INPUT);
 }
-
 void loop()
 {
   // 割り込み処理としてonRisin1を呼ぶ
@@ -358,7 +326,6 @@ void loop()
   attachInterrupt(digitalPinToInterrupt(39), onRising2, FALLING);
   Serial.println("カウンター数:" + String(pulseCounter));
   Serial.println("カウンター数2:" + String(pulseCounter2));
-
   delay(100);
 }
 ```
