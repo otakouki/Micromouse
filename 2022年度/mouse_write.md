@@ -11,7 +11,7 @@
 ## コード説明
 ### 通電チェック
 基盤に書き込めるか確認するためにLEDを光らせるコード
-:::spoiler サンプルコード
+<details><summary> サンプルコード </summary>
 
 ```arduino=
 /**
@@ -46,7 +46,7 @@ void loop()
   delay(300);
 }
 ```
-:::
+</details>
 
 ### LEDを光らすコードだが書き込めない場合
 
@@ -58,7 +58,7 @@ upload speed を115200/921600→230400
 
 モーター2つを回らせるコード
 
-:::spoiler サンプルコード
+<details><summary> サンプルコード</summary>
 
 
 ```arduino
@@ -172,7 +172,7 @@ void loop(){
   digitalWrite(LED, HIGH);
 }
 ```
-:::
+</details>
 AIN1:LOW,AIN2:HIGHにすると左のモーターが正回転
 
 BIN1:LOW,BIN2:HIGHにすると左のモーターが正回転
@@ -194,7 +194,7 @@ ledcWrite(CHANNEL_ACHANNEL_A, 30);
 ### MCP3008I/P
 
 ラインセンサの値を取得するためのコード
-:::spoiler サンプルコード
+<details><summary> サンプルコード</summary>
 
 ```arduino
 /**
@@ -309,7 +309,7 @@ void get_adc()
   }
 }
 ```
-:::
+</details>
 
 R_sns配列:ラインセンサーの右側の値が0か1ではいる
 
@@ -321,7 +321,7 @@ TH_LVL定数:白線と黒線を判別するための境界値
 
 回転数を取得するためのコード
 
-:::spoiler サンプルコード
+<details><summary> サンプルコード</summary>
 
 
 ```arduino
@@ -362,7 +362,7 @@ void loop()
   delay(100);
 }
 ```
-:::
+</details>
 
 onRising1,onRising2 関数: 割り込みで呼ぶ処理
 
